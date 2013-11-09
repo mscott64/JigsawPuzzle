@@ -11,7 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\accumaa.cpp" />
+    <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\Piece.cpp" />
+    <ClCompile Include="..\src\Puzzle.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Piece.h" />
+    <ClInclude Include="..\src\Puzzle.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{59C140D0-DAFE-498C-A985-92E0A1F3A436}</ProjectGuid>
