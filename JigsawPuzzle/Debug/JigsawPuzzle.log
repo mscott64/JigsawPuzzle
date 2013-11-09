@@ -1,0 +1,30 @@
+﻿Build started 11/9/2013 11:10:16 AM.
+     1>Project "C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\JigsawPuzzle.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Touching "Debug\JigsawPuzzle.unsuccessfulbuild".
+       ClCompile:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt accumaa.cpp
+         accumaa.cpp
+     1>c:\users\michelle\documents\classes\6456\project\jigsawpuzzle\jigsawpuzzle\accumaa.cpp(22): warning C4244: '=' : conversion from 'int' to 'GLfloat', possible loss of data
+     1>c:\users\michelle\documents\classes\6456\project\jigsawpuzzle\jigsawpuzzle\accumaa.cpp(126): warning C4244: '=' : conversion from 'const GLdouble' to 'GLfloat', possible loss of data
+     1>c:\users\michelle\documents\classes\6456\project\jigsawpuzzle\jigsawpuzzle\accumaa.cpp(127): warning C4244: '=' : conversion from 'const GLdouble' to 'GLfloat', possible loss of data
+       ManifestResourceCompile:
+         All outputs are up-to-date.
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib freeglut.lib /MANIFEST /ManifestFile:"Debug\JigsawPuzzle.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.lib" /MACHINE:X86 Debug\JigsawPuzzle.exe.embed.manifest.res
+         Debug\accumaa.obj
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\JigsawPuzzle.exe.embed.manifest" /manifest Debug\JigsawPuzzle.exe.intermediate.manifest
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"Debug\JigsawPuzzle.exe.embed.manifest.res" Debug\JigsawPuzzle_manifest.rc 
+       LinkEmbedManifest:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib freeglut.lib /MANIFEST /ManifestFile:"Debug\JigsawPuzzle.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.lib" /MACHINE:X86 Debug\JigsawPuzzle.exe.embed.manifest.res
+         Debug\accumaa.obj
+         JigsawPuzzle.vcxproj -> C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\Debug\JigsawPuzzle.exe
+       FinalizeBuildStatus:
+         Deleting file "Debug\JigsawPuzzle.unsuccessfulbuild".
+         Touching "Debug\JigsawPuzzle.lastbuildstate".
+     1>Done Building Project "C:\Users\Michelle\Documents\Classes\6456\Project\JigsawPuzzle\JigsawPuzzle\JigsawPuzzle.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.85
