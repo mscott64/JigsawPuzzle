@@ -1,34 +1,34 @@
 #include <stdlib.h>
 #include <math.h>
+#include "Puzzle.h"
+#include <iostream> //TODO: get rid of this
 #ifdef __APPLE__
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
 #endif
 
-// all variables initialized to 1.0, meaning
-// the triangle will initially be white
-float red=1.0f, blue=1.0f, green=1.0f;
+double cx=0.0, cy=10.0, cz=1.0;
+double dx=0.0, dy=-10.0, dz=-1.0;
+const double fraction = 0.1;
+double zoom = 0;
+Puzzle *puzzle;
+Piece *piece;
+int prev_x, prev_y;
 
-// angle of rotation for the camera direction
-float angle=0.0f;
-// actual vector representing the camera's direction
-float lx=0.0f,lz=-1.0f;
-// XZ position of the camera
-float x=0.0f,z=5.0f;
-
-void changeSize(int w, int h) {
+void reshape(int w, int h) {
 
 	// Prevent a divide by zero, when window is too short
 	// (you cant make a window of zero width).
 	if (h == 0)
 		h = 1;
-	float ratio =  w * 1.0 / h;
+	double ratio =  w * 1.0f / h;
 
-        // Use the Projection Matrix
+    
+	// Use the Projection Matrix
 	glMatrixMode(GL_PROJECTION);
 
-        // Reset Matrix
+    // Reset Matrix
 	glLoadIdentity();
 
 	// Set the viewport to be the entire window
@@ -41,47 +41,29 @@ void changeSize(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void drawSnowMan() {
+void draw(void) {
 
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-// Draw Body
-	glTranslatef(0.0f ,0.75f, 0.0f);
-	glutSolidSphere(0.75f,20,20);
-
-// Draw Head
-	glTranslatef(0.0f, 1.0f, 0.0f);
-	glutSolidSphere(0.25f,20,20);
-
-// Draw Eyes
-	glPushMatrix();
-	glColor3f(0.0f,0.0f,0.0f);
-	glTranslatef(0.05f, 0.10f, 0.18f);
-	glutSolidSphere(0.05f,10,10);
-	glTranslatef(-0.1f, 0.0f, 0.0f);
-	glutSolidSphere(0.05f,10,10);
-	glPopMatrix();
-
-// Draw Nose
-	glColor3f(1.0f, 0.5f , 0.5f);
-	glRotatef(0.0f,1.0f, 0.0f, 0.0f);
-	glutSolidCone(0.08f,0.5f,10,2);
-}
-
-void renderScene(void) {
-
-	// Clear Color and Depth Buffers
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	// Clear Color, Depth, and Stencil buffers
+	glClearStencil(0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	
+	glEnable(GL_STENCIL_TEST);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	// Reset transformations
 	glLoadIdentity();
+
+	cx += zoom * dx;
+	cy += zoom * dy;
+	cz += zoom * dz;
+	zoom = 0;
+
 	// Set the camera
-	gluLookAt(	x, 1.0f, z,
-				x+lx, 1.0f,  z+lz,
+	gluLookAt(	cx, cy, cz,
+				cx+dx, cy+dy, cz+dz,
 				0.0f, 1.0f,  0.0f);
 
-        // Draw ground
+    // Draw playing surface
+	glStencilFunc(GL_ALWAYS, 0, -1);
 	glColor3f(0.9f, 0.9f, 0.9f);
 	glBegin(GL_QUADS);
 		glVertex3f(-100.0f, 0.0f, -100.0f);
@@ -90,71 +72,98 @@ void renderScene(void) {
 		glVertex3f( 100.0f, 0.0f, -100.0f);
 	glEnd();
 
-        // Draw 36 SnowMen
-	for(int i = -3; i < 3; i++)
-		for(int j=-3; j < 3; j++) {
-			glPushMatrix();
-			glTranslatef(i*10.0,0,j * 10.0);
-			drawSnowMan();
-			glPopMatrix();
-		}
-
+	puzzle->draw();
+	 
 	glutSwapBuffers();
 }
 
-void processNormalKeys(unsigned char key, int x, int y) {
+void keyPressed(unsigned char key, int x, int y) {
 
-	if (key == 27)
+	switch(key) {
+	case 27: // Escape or q to quit
+	case 'q':
+	case 'Q':
 		exit(0);
+		break;
+	case 'n': // zoom in
+	case 'N':
+		zoom = 0.01;
+		break;
+	case 'm': // zoom out
+	case 'M':
+		zoom = -0.01;
+		break;
+	}
 }
 
-void processSpecialKeys(int key, int xx, int yy) {
-
-	float fraction = 0.1f;
+void specKeyPressed(int key, int xx, int yy) {
 
 	switch (key) {
 		case GLUT_KEY_LEFT :
-			angle -= 0.01f;
-			lx = sin(angle);
-			lz = -cos(angle);
+			cx-=fraction;
 			break;
 		case GLUT_KEY_RIGHT :
-			angle += 0.01f;
-			lx = sin(angle);
-			lz = -cos(angle);
+			cx+=fraction;
 			break;
 		case GLUT_KEY_UP :
-			x += lx * fraction;
-			z += lz * fraction;
+			cz-=fraction;
 			break;
 		case GLUT_KEY_DOWN :
-			x -= lx * fraction;
-			z -= lz * fraction;
+			cz+=fraction;
 			break;
 	}
+}
+
+void mousePressed(int button, int state, int x, int y) {
+	
+	if(state == GLUT_UP) {
+		piece = NULL;
+		return;
+	}
+
+	int width = glutGet(GLUT_WINDOW_WIDTH);
+	int height = glutGet(GLUT_WINDOW_HEIGHT);
+	GLuint id;
+	glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &id);
+	piece = puzzle->getPiece(id);
+	prev_x = x; prev_y = y;
+}
+
+void mouseMoved(int x, int y) {
+
+	if(piece != NULL) {
+		float fac = 0.001 * cy;
+		float delta_x = -fac * (prev_x - x); 
+		float delta_z = -fac * (prev_y - y);
+		piece->move(delta_x, 0.0f, delta_z);
+	}
+	prev_x = x; prev_y = y;
 }
 
 int main(int argc, char **argv) {
 
 	// init GLUT and create window
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
-	glutInitWindowPosition(100,100);
-	glutInitWindowSize(320,320);
-	glutCreateWindow("Lighthouse3D- GLUT Tutorial");
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA | GLUT_STENCIL);
+	glutInitWindowPosition(50,50);
+	glutInitWindowSize(1100, 600);
+	glutCreateWindow("Jigsaw Puzzle");
+	puzzle = new Puzzle(4);
+	piece = NULL;
 
 	// register callbacks
-	glutDisplayFunc(renderScene);
-	glutReshapeFunc(changeSize);
-	glutIdleFunc(renderScene);
-	glutKeyboardFunc(processNormalKeys);
-	glutSpecialFunc(processSpecialKeys);
+	glutDisplayFunc(draw);
+	glutReshapeFunc(reshape);
+	glutIdleFunc(draw);
+	glutKeyboardFunc(keyPressed);
+	glutSpecialFunc(specKeyPressed);
+	glutMouseFunc(mousePressed);
+	glutMotionFunc(mouseMoved);
 
 	// OpenGL init
 	glEnable(GL_DEPTH_TEST);
 
 	// enter GLUT event processing cycle
 	glutMainLoop();
-
 	return 0;
 }
