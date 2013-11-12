@@ -4,7 +4,7 @@ Puzzle::Puzzle(int num_pieces) {
 	mPieces.resize(num_pieces);
 	for(int i=0; i < num_pieces; i++) {
 		mPieces[i] = new Piece(i+1); // to match stencil buffer
-		mPieces[i]->setPos(i-2.0f, 2.0f, i-2.0f);
+		mPieces[i]->setPos(i-1.0f, 1.0f, i-1.0f);
 		mPieces[i]->setSize(0.75f, 0.75f);
 	}
 }

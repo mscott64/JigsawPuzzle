@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include "CImg.h"
 #include "Puzzle.h"
 #include <iostream> //TODO: get rid of this
 #ifdef __APPLE__
@@ -8,10 +9,12 @@
 #include <GL/glut.h>
 #endif
 
-double cx=0.0, cy=10.0, cz=1.0;
-double dx=0.0, dy=-10.0, dz=-1.0;
-const double fraction = 0.1;
-double zoom = 0;
+using namespace cimg_library;
+
+float cx=0.0f, cy=10.0f, cz=1.0f;
+float dx=0.0f, dy=-10.0f, dz=-1.0f;
+const float fraction = 0.1f;
+float zoom = 0.0f;
 Puzzle *puzzle;
 Piece *piece;
 int prev_x, prev_y;
@@ -22,7 +25,7 @@ void reshape(int w, int h) {
 	// (you cant make a window of zero width).
 	if (h == 0)
 		h = 1;
-	double ratio =  w * 1.0f / h;
+	float ratio =  w * 1.0f / h;
 
     
 	// Use the Projection Matrix
@@ -55,7 +58,7 @@ void draw(void) {
 	cx += zoom * dx;
 	cy += zoom * dy;
 	cz += zoom * dz;
-	zoom = 0;
+	zoom = 0.0f;
 
 	// Set the camera
 	gluLookAt(	cx, cy, cz,
@@ -87,11 +90,11 @@ void keyPressed(unsigned char key, int x, int y) {
 		break;
 	case 'n': // zoom in
 	case 'N':
-		zoom = 0.01;
+		zoom = 0.01f;
 		break;
 	case 'm': // zoom out
 	case 'M':
-		zoom = -0.01;
+		zoom = -0.01f;
 		break;
 	}
 }
@@ -132,7 +135,7 @@ void mousePressed(int button, int state, int x, int y) {
 void mouseMoved(int x, int y) {
 
 	if(piece != NULL) {
-		float fac = 0.001 * cy;
+		float fac = 0.001f * cy;
 		float delta_x = -fac * (prev_x - x); 
 		float delta_z = -fac * (prev_y - y);
 		piece->move(delta_x, 0.0f, delta_z);
@@ -148,7 +151,7 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(50,50);
 	glutInitWindowSize(1100, 600);
 	glutCreateWindow("Jigsaw Puzzle");
-	puzzle = new Puzzle(4);
+	puzzle = new Puzzle(3);
 	piece = NULL;
 
 	// register callbacks
