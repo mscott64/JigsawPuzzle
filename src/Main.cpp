@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <math.h>
-#include "CImg.h"
 #include "Puzzle.h"
 #include <iostream> //TODO: get rid of this
 #ifdef __APPLE__
@@ -8,8 +7,6 @@
 #else
 #include <GL/glut.h>
 #endif
-
-using namespace cimg_library;
 
 float cx=0.0f, cy=10.0f, cz=1.0f;
 float dx=0.0f, dy=-10.0f, dz=-1.0f;
@@ -165,6 +162,7 @@ int main(int argc, char **argv) {
 
 	// OpenGL init
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
 
 	// enter GLUT event processing cycle
 	glutMainLoop();

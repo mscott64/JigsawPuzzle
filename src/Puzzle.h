@@ -11,6 +11,7 @@ public:
 	Piece *getPiece(unsigned int id);
 private:
 	std::vector<Piece *> mPieces;
+	unsigned int mTexture;
 };
 
 #endif /* Puzzle.h */

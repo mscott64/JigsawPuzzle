@@ -16,7 +16,6 @@
     <ClCompile Include="..\src\Puzzle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\CImg.h" />
     <ClInclude Include="..\src\Coord.h" />
     <ClInclude Include="..\src\Piece.h" />
     <ClInclude Include="..\src\Puzzle.h" />

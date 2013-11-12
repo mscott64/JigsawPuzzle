@@ -7,7 +7,7 @@
 #endif
 
 const float def_size = 1.0f;
-const float half_depth = 0.25f;
+const float half_depth = 0.125f;
 
 Piece::Piece(int id) {
 	mId = id;
@@ -16,56 +16,56 @@ Piece::Piece(int id) {
 	mw = mh = def_size;
 }
 
-void Piece::draw(float r, float g, float b) {
+void Piece::draw() {
 	glStencilFunc(GL_ALWAYS, mId, -1);
-	glColor3f(r, g, b);
+	
 	//ccw
 	//Top
 	glBegin(GL_QUADS);
-	glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 1.0f);glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 0.0f);glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz+mh);
+	glTexCoord2f(1.0f, 0.0f);glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz+mh);
+	glTexCoord2f(1.0f, 1.0f);glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz-mh);
 	glEnd();
-
-	//Bottom
+	
+	//Bottom - ignoring because cannot be seen currently
 	glBegin(GL_QUADS);
-	glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 1.0f);glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(1.0f, 1.0f);glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(1.0f, 0.0f);glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz+mh);
+	glTexCoord2f(0.0f, 0.0f);glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz+mh);
 	glEnd();
 
 	//Front
 	glBegin(GL_QUADS);
-	glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz+mh);
+	glTexCoord2f(0.0f, 0.0f);glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz+mh);
+	glTexCoord2f(0.0f, 0.0f);glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz+mh);
+	glTexCoord2f(1.0f, 0.0f);glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz+mh);
+	glTexCoord2f(1.0f, 0.0f);glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz+mh);
 	glEnd();
 
-	//Back - ignoring because camera angle makes it impossible to see
+	//Back 
 	glBegin(GL_QUADS);
-	glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz-mh);
+	glTexCoord2f(1.0f, 1.0f);glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz-mh);
+	glTexCoord2f(1.0f, 1.0f);glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 1.0f);glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 1.0f);glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz-mh);
 	glEnd();
 
 	//Left
 	glBegin(GL_QUADS);
-	glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz+mh);
+	glTexCoord2f(0.0f, 1.0f);glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 1.0f);glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(0.0f, 0.0f);glVertex3f(mPos->mx-mw, mPos->my-half_depth, mPos->mz+mh);
+	glTexCoord2f(0.0f, 0.0f);glVertex3f(mPos->mx-mw, mPos->my+half_depth, mPos->mz+mh);
 	glEnd();
 
 	//Right
 	glBegin(GL_QUADS);
-	glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz+mh);
-	glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
-	glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz-mh);
+	glTexCoord2f(1.0f, 0.0f);glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz+mh);
+	glTexCoord2f(1.0f, 0.0f);glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz+mh);
+	glTexCoord2f(1.0f, 1.0f);glVertex3f(mPos->mx+mw, mPos->my-half_depth, mPos->mz-mh);
+	glTexCoord2f(1.0f, 1.0f);glVertex3f(mPos->mx+mw, mPos->my+half_depth, mPos->mz-mh);
 	glEnd();
 }
 

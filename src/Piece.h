@@ -6,7 +6,7 @@ class Coord;
 class Piece {
 public:
 	Piece(int id);
-	void draw(float r, float g, float b);
+	void draw();
 	void setTruePos(float x, float y, float z);
 	void setPos(float x, float y, float z);
 	Coord *getTruePos() { return mTruePos; }
