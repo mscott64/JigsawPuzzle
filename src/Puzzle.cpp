@@ -11,7 +11,7 @@
 #define IMG_PATH "../images/"
 
 typedef unsigned char Uint8;
-const char *img_nm = "atl_falcons.bmp";
+const char *img_nm = "ga_tech.bmp";//"atl_falcons.bmp";
 
 int LoadBMP(const char* location, GLuint &texture) {
 	Uint8* datBuff[2] = {nullptr, nullptr}; // Header buffers
@@ -91,11 +91,20 @@ int LoadBMP(const char* location, GLuint &texture) {
 }
 
 Puzzle::Puzzle(int num_pieces) {
-	mPieces.resize(num_pieces);
-	for(int i=0; i < num_pieces; i++) {
-		mPieces[i] = new Piece(i+1); // to match stencil buffer
-		mPieces[i]->setPos(i-1.0f, 1.0f, i-1.0f);
-		mPieces[i]->setSize(0.75f, 0.75f);
+	const float space = 0.1f;
+	mPieces.resize(num_pieces * num_pieces);
+	int index = 0;
+	float piece_sz = 5.0f / num_pieces;
+	float start = -num_pieces * (piece_sz + space) / 2.0f;
+	float tex_sz = 1.0f / num_pieces;
+	for(int i = 0; i < num_pieces; i++) {
+		for(int j = 0; j < num_pieces; j++) {
+			index = i * num_pieces + j;
+			mPieces[index] = new Piece(index+1); // to match stencil buffer
+			mPieces[index]->setPos(start + i*(piece_sz + space), 1.0f, start + j*(piece_sz + space));
+			mPieces[index]->setSize(piece_sz, piece_sz);
+			mPieces[index]->setTextureBounds(i*tex_sz, 1.0f-(j+1)*tex_sz, (i+1)*tex_sz, 1.0f-j*tex_sz);
+		}
 	}
 
 	char full_img_nm[50];
@@ -105,6 +114,11 @@ Puzzle::Puzzle(int num_pieces) {
 		std::cout << "Error loading texture" << std::endl;
 		exit(1);
 	}
+}
+
+Puzzle::~Puzzle() {
+	for(unsigned int i = 0; i < mPieces.size(); i++)
+		delete mPieces[i];
 }
 
 void Puzzle::draw() {

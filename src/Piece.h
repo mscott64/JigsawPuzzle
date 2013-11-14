@@ -6,10 +6,10 @@ class Coord;
 class Piece {
 public:
 	Piece(int id);
+	~Piece();
 	void draw();
-	void setTruePos(float x, float y, float z);
 	void setPos(float x, float y, float z);
-	Coord *getTruePos() { return mTruePos; }
+	void setTextureBounds(float lx, float ly, float hx, float hy);
 	Coord *getPos() { return mPos; };
 	void setSize(float w, float h) { mw = w/2.0f; mh = h/2.0f; }
 	float getWidth() { return mw * 2.0f; }
@@ -20,8 +20,8 @@ public:
 private:
 	int mId;
 	float mw, mh; // half of width and height
-	Coord *mTruePos;
 	Coord *mPos;
+	Coord *mLow, *mHigh;
 };
 
 #endif /* Piece.h */

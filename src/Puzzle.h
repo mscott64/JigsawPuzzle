@@ -4,9 +4,12 @@
 #include "Piece.h"
 #include <vector>
 
+enum {EASY = 7, MEDIUM = 10, HARD = 14};
+
 class Puzzle {
 public:
-	Puzzle(int num_pieces);
+	Puzzle(int type);
+	~Puzzle();
 	void draw();
 	Piece *getPiece(unsigned int id);
 private:

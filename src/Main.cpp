@@ -8,7 +8,7 @@
 #include <GL/glut.h>
 #endif
 
-float cx=0.0f, cy=10.0f, cz=1.0f;
+float cx=0.0f, cy=10.0f, cz=0.5f;
 float dx=0.0f, dy=-10.0f, dz=-1.0f;
 const float fraction = 0.1f;
 float zoom = 0.0f;
@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(50,50);
 	glutInitWindowSize(1100, 600);
 	glutCreateWindow("Jigsaw Puzzle");
-	puzzle = new Puzzle(3);
+	puzzle = new Puzzle(EASY);
 	piece = NULL;
 
 	// register callbacks
