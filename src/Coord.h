@@ -1,9 +1,6 @@
 #ifndef COORD_H
 #define COORD_H
 
-#include <math.h>
-const float eps = 0.01f;
-
 class Coord {
 public:
 	Coord() { setCoord(0.0f,0.0f,0.0f); }

@@ -12,9 +12,13 @@ public:
 	~Puzzle();
 	void draw();
 	Piece *getPiece(unsigned int id);
+	bool check(Piece *p);
 private:
+	void join(Piece *moving, Piece *fixed, int dir);
+	bool connect(Piece *p);
 	std::vector<Piece *> mPieces;
 	unsigned int mTexture;
+	float mPieceSize;
 };
 
 #endif /* Puzzle.h */

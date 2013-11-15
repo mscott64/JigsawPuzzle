@@ -121,11 +121,12 @@ void mousePressed(int button, int state, int x, int y) {
 		return;
 	}
 
-	int width = glutGet(GLUT_WINDOW_WIDTH);
-	int height = glutGet(GLUT_WINDOW_HEIGHT);
-	GLuint id;
-	glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &id);
-	piece = puzzle->getPiece(id);
+	if(glutGetModifiers() == GLUT_ACTIVE_CTRL) {
+		int height = glutGet(GLUT_WINDOW_HEIGHT);
+		GLuint id;
+		glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &id);
+		piece = puzzle->getPiece(id);
+	}
 	prev_x = x; prev_y = y;
 }
 
@@ -136,6 +137,8 @@ void mouseMoved(int x, int y) {
 		float delta_x = -fac * (prev_x - x); 
 		float delta_z = -fac * (prev_y - y);
 		piece->move(delta_x, 0.0f, delta_z);
+		if(puzzle->check(piece))
+			piece = NULL;
 	}
 	prev_x = x; prev_y = y;
 }
