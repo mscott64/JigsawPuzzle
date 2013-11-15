@@ -16,6 +16,7 @@ public:
 	}
 	unsigned int getNumPieces() { return mPieces.size(); }
 	Piece *getPiece(int i) { return mPieces[i]; }
+	std::vector<Piece *>getPieces() { return mPieces; }
 
 private:
 	std::vector<Piece *> mPieces;

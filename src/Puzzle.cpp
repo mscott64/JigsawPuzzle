@@ -275,9 +275,13 @@ void Puzzle::join(Piece *moving, Piece *fixed, int dir) {
 	} else if(moving->mJoined == NULL && fixed->mJoined != NULL) { // fixed is attached
 		fixed->mJoined->addPiece(moving);
 		moving->mJoined = fixed->mJoined;
-	} else { // both are attached
-		for(unsigned int i = 0; i < moving->mJoined->getNumPieces(); i++)
-			fixed->mJoined->addPiece(moving->mJoined->getPiece(i));
-		moving->mJoined = fixed->mJoined;
+	} else if(moving->mJoined != fixed->mJoined) { // both are attached
+		Piece *p;
+		std::vector<Piece *> pieces = moving->mJoined->getPieces();
+		for(unsigned int i = 0; i < pieces.size(); i++) {
+			p = pieces[i];
+			fixed->mJoined->addPiece(p);
+			p->mJoined = fixed->mJoined;
+		}
 	}
 }
