@@ -33,14 +33,14 @@ void Piece::draw() {
 	if(mJoined == NULL) {
 		glTranslatef(mPos->mx, mPos->my, mPos->mz);
 		glRotatef(mRotateAngle, 0.0f, 1.0f, 0.0f);
-		glRotatef(mFlipAngleX, 1.0f, 0.0f, 0.0f);
-		glRotatef(mFlipAngleY, 0.0f, 0.0f, 1.0f);
+		glRotatef(mFlipAngleX, 0.0f, 0.0f, 1.0f);
+		glRotatef(mFlipAngleY, 1.0f, 0.0f, 0.0f);
 	} else {
 		Coord *center = mJoined->getCenter();
 		glTranslatef(center->mx, center->my, center->mz);
 		glRotatef(mJoined->getRotateAngle(), 0.0f, 1.0f, 0.0f);
-		glRotatef(mJoined->getFlipAngleX(), 1.0f, 0.0f, 0.0f);
-		glRotatef(mJoined->getFlipAngleY(), 0.0f, 0.0f, 1.0f);
+		glRotatef(mJoined->getFlipAngleX(), 0.0f, 0.0f, 1.0f);
+		glRotatef(mJoined->getFlipAngleY(), 1.0f, 0.0f, 0.0f);
 		glTranslatef(mPos->mx - center->mx, 0.0f, mPos->mz - center->mz);
 	}
 	//ccw
