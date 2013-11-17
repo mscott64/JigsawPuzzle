@@ -1,25 +1,29 @@
 #ifndef JOINED_H
 #define JOINED_H
 
-#include "Piece.h"
 #include <vector>
+#include "Group.h"
+class Piece;
+class Coord;
 
-class Joined {
+class Joined : public Group {
 public:
-	Joined(Piece *p) { addPiece(p); }
-	void addPiece(Piece *p) { // don't add duplicates
-		for(unsigned int i = 0; i < mPieces.size(); i++) {
-			if(mPieces[i] == p)
-				return;
-		}
-		mPieces.push_back(p); 
-	}
-	unsigned int getNumPieces() { return mPieces.size(); }
-	Piece *getPiece(int i) { return mPieces[i]; }
-	std::vector<Piece *>getPieces() { return mPieces; }
+	Joined(Piece *p);
+	void addPiece(Piece *p);
+	Coord *getCenter() { return mCenter; }
+	float getRotateAngle() { return mRotateAngle; }
+	float getFlipAngleX() { return mFlipAngleX; }
+	float getFlipAngleY() { return mFlipAngleY; }
+	void rotate(float angle) { mRotateAngle += angle; }
+	void computeCenter();
+	void flipX();
+	void flipY();
 
 private:
-	std::vector<Piece *> mPieces;
+	Coord *mCenter;
+	float mRotateAngle;
+	float mFlipAngleX;
+	float mFlipAngleY;
 };
 
 #endif /* Joined.h */

@@ -3,6 +3,7 @@
 
 #include "Piece.h"
 #include <vector>
+#define IMG_PATH "../images/"
 
 enum {EASY = 7, MEDIUM = 10, HARD = 14};
 
@@ -13,6 +14,7 @@ public:
 	void draw();
 	Piece *getPiece(unsigned int id);
 	bool check(Piece *p);
+	static int LoadBMP(const char* location, unsigned int &texture);
 private:
 	void join(Piece *moving, Piece *fixed, int dir);
 	bool connect(Piece *p);

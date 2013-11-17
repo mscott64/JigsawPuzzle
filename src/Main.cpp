@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "Puzzle.h"
+#include "Joined.h"
 #include <iostream> //TODO: get rid of this
 #ifdef __APPLE__
 #include <GLUT/glut.h>
@@ -15,6 +16,7 @@ float zoom = 0.0f;
 Puzzle *puzzle;
 Piece *piece;
 int prev_x, prev_y;
+unsigned int group_button_texture;
 
 void reshape(int w, int h) {
 
@@ -41,7 +43,47 @@ void reshape(int w, int h) {
 	glMatrixMode(GL_MODELVIEW);
 }
 
-void draw(void) {
+void drawHighlightRect(float r, float g, float b, Piece *piece) {
+	const float extra = 0.05f;
+	glStencilFunc(GL_ALWAYS, 0, -1);
+	float w, h;
+	Coord *pos = piece->getPos();
+	w = piece->getWidth() + extra;
+	h = piece->getHeight() + extra;
+	glPushMatrix();
+	if(piece->mJoined == NULL) {
+		glTranslatef(pos->mx, pos->my, pos->mz);
+		glRotatef(piece->getRotateAngle(), 0.0f, 1.0f, 0.0f);
+	} else {
+		Coord *center = piece->mJoined->getCenter();
+		glTranslatef(center->mx, center->my, center->mz);
+		glRotatef(piece->mJoined->getRotateAngle(), 0.0f, 1.0f, 0.0f);
+		glTranslatef(pos->mx - center->mx, 0.0f, pos->mz - center->mz);
+	}
+	glColor3f(r, g, b);
+	glBegin(GL_QUADS);
+	glVertex3f(-w, 0.0f, h);
+	glVertex3f(w, 0.0f, h);
+	glVertex3f(w, 0.0f, -h);
+	glVertex3f(-w, 0.0f, -h);
+	glEnd();
+	glPopMatrix();
+}
+
+void drawHighlight() {
+	if(piece == NULL)
+		return;
+
+	if(piece->mJoined != NULL) {
+		Joined *join = piece->mJoined;
+		for(unsigned int i = 0; i < join->getNumPieces(); i++)
+			drawHighlightRect(0.75f, 0.75f, 0.0f, join->getPiece(i));
+	} else {
+		drawHighlightRect(0.75f, 0.75f, 0.0f, piece);
+	}
+}
+
+void draw() {
 
 	// Clear Color, Depth, and Stencil buffers
 	glClearStencil(0);
@@ -71,6 +113,7 @@ void draw(void) {
 		glVertex3f( 100.0f, 0.0f,  100.0f);
 		glVertex3f( 100.0f, 0.0f, -100.0f);
 	glEnd();
+	drawHighlight();
 
 	puzzle->draw();
 	 
@@ -93,6 +136,25 @@ void keyPressed(unsigned char key, int x, int y) {
 	case 'M':
 		zoom = -0.01f;
 		break;
+	case 'f':
+	case 'F':
+		if(piece != NULL)
+			piece->flipX();
+		break;
+	case 'd':
+	case 'D':
+		if(piece != NULL)
+			piece->flipY();
+		break;
+	case 'r':
+	case 'R':
+		if(piece != NULL)
+			piece->rotate(-1.0f);
+		break;
+	case 'e':
+	case 'E':
+		if(piece != NULL)
+			piece->rotate(1.0f);
 	}
 }
 
@@ -115,17 +177,12 @@ void specKeyPressed(int key, int xx, int yy) {
 }
 
 void mousePressed(int button, int state, int x, int y) {
-	
-	if(state == GLUT_UP) {
-		piece = NULL;
-		return;
-	}
 
-	if(glutGetModifiers() == GLUT_ACTIVE_CTRL) {
+	if(state == GLUT_DOWN) {
 		int height = glutGet(GLUT_WINDOW_HEIGHT);
-		GLuint id;
-		glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &id);
-		piece = puzzle->getPiece(id);
+		GLuint piece_id;
+		glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &piece_id);
+		piece = puzzle->getPiece(piece_id);
 	}
 	prev_x = x; prev_y = y;
 }
@@ -140,6 +197,10 @@ void mouseMoved(int x, int y) {
 		if(puzzle->check(piece))
 			piece = NULL;
 	}
+	prev_x = x; prev_y = y;
+}
+
+void passiveMouseMoved(int x, int y) {
 	prev_x = x; prev_y = y;
 }
 
@@ -162,6 +223,7 @@ int main(int argc, char **argv) {
 	glutSpecialFunc(specKeyPressed);
 	glutMouseFunc(mousePressed);
 	glutMotionFunc(mouseMoved);
+	glutPassiveMotionFunc(passiveMouseMoved);
 
 	// OpenGL init
 	glEnable(GL_DEPTH_TEST);

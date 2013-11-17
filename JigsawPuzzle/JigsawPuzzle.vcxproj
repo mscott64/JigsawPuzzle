@@ -11,12 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Joined.cpp" />
     <ClCompile Include="..\src\Main.cpp" />
     <ClCompile Include="..\src\Piece.cpp" />
     <ClCompile Include="..\src\Puzzle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Coord.h" />
+    <ClInclude Include="..\src\Group.h" />
     <ClInclude Include="..\src\Joined.h" />
     <ClInclude Include="..\src\Piece.h" />
     <ClInclude Include="..\src\Puzzle.h" />

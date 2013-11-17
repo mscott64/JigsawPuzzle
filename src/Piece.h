@@ -5,6 +5,7 @@
 #include <vector>
 
 class Joined;
+class Group;
 
 enum {ABOVE, BELOW, LEFT, RIGHT};
 
@@ -17,8 +18,8 @@ public:
 	void setTextureBounds(float lx, float ly, float hx, float hy);
 	Coord *getPos() { return mPos; };
 	void setSize(float w, float h) { mw = w/2.0f; mh = h/2.0f; }
-	float getWidth() { return mw * 2.0f; }
-	float getHeight() { return mh * 2.0f; }
+	float getWidth() { return mw; }
+	float getHeight() { return mh; }
 	int getID() { return mId; }
 	void move(float dx, float dy, float dz);
 	void addNeighbor(Piece *p) { mNeighbors.push_back(p); }
@@ -28,7 +29,14 @@ public:
 	unsigned int getNumNeighbors() { return mNeighbors.size(); }
 	Piece *getNeighbor(int i) { return mNeighbors[i]; }
 	int getDirection(int i) { return mDirections[i]; }
+	void flipX();
+	void flipY();
+	void rotate(float angle);
+	float getRotateAngle() { return mRotateAngle; }
+	float getFlipAngleX() { return mFlipAngleX; }
+	float getFlipAngleY() { return mFlipAngleY; }
 	Joined *mJoined;
+	Group *mGroup;
 
 private:
 	int mId;
@@ -37,6 +45,9 @@ private:
 	Coord *mLow, *mHigh;
 	std::vector<Piece *> mNeighbors;
 	std::vector<int> mDirections;
+	float mFlipAngleX;
+	float mFlipAngleY;
+	float mRotateAngle;
 };
 
 #endif /* Piece.h */

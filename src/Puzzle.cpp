@@ -10,13 +10,12 @@
 #include <stdio.h>
 #include <iostream> // TODO: get rid of this
 #include "Joined.h"
-#define IMG_PATH "../images/"
 
 typedef unsigned char Uint8;
 const char *img_nm = "castle.bmp";//"ga_tech.bmp";//"atl_falcons.bmp";
 const float eps = 0.04f;
 
-int LoadBMP(const char* location, GLuint &texture) {
+int Puzzle::LoadBMP(const char* location, unsigned int &texture) {
 	Uint8* datBuff[2] = {nullptr, nullptr}; // Header buffers
 	Uint8* pixels = nullptr;
 
@@ -155,7 +154,7 @@ Puzzle::~Puzzle() {
 void Puzzle::draw() {
 	float c = 0.0f;
 	float change = 1.0f / mPieces.size();;
-	
+	glColor3f(1.0f, 1.0f, 1.0f);
 	glBindTexture(GL_TEXTURE_2D, mTexture);
 	for(unsigned int i = 0; i < mPieces.size(); i++) {
 		mPieces[i]->draw();
@@ -266,9 +265,9 @@ void Puzzle::join(Piece *moving, Piece *fixed, int dir) {
 	}
 	moving->move(dx, dy, dz);
 	if(moving->mJoined == NULL && fixed->mJoined == NULL) { // neither is attached
-		moving->mJoined = new Joined(moving);
-		moving->mJoined->addPiece(fixed);
-		fixed->mJoined = moving->mJoined;
+		fixed->mJoined = new Joined(fixed);
+		fixed->mJoined->addPiece(moving);
+		moving->mJoined = fixed->mJoined;
 	} else if(moving->mJoined != NULL && fixed->mJoined == NULL) { // moving is attached
 		moving->mJoined->addPiece(fixed);
 		fixed->mJoined = moving->mJoined;
@@ -284,4 +283,5 @@ void Puzzle::join(Piece *moving, Piece *fixed, int dir) {
 			p->mJoined = fixed->mJoined;
 		}
 	}
+	fixed->mJoined->computeCenter();
 }
