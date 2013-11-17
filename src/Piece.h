@@ -16,7 +16,7 @@ public:
 	void draw();
 	void setPos(float x, float y, float z);
 	void setTextureBounds(float lx, float ly, float hx, float hy);
-	Coord *getPos() { return mPos; };
+	Coord *getPos(bool compute);
 	void setSize(float w, float h) { mw = w/2.0f; mh = h/2.0f; }
 	float getWidth() { return mw; }
 	float getHeight() { return mh; }
@@ -32,9 +32,9 @@ public:
 	void flipX();
 	void flipY();
 	void rotate(float angle);
-	float getRotateAngle() { return mRotateAngle; }
-	float getFlipAngleX() { return mFlipAngleX; }
-	float getFlipAngleY() { return mFlipAngleY; }
+	float getRotateAngle();
+	float getFlipAngleX();
+	float getFlipAngleY();
 	Joined *mJoined;
 	Group *mGroup;
 

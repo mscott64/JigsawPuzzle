@@ -4,6 +4,8 @@
 Joined::Joined(Piece *p) {
 	mCenter = new Coord();
 	mRotateAngle = p->getRotateAngle();
+	mFlipAngleX = p->getFlipAngleX();
+	mFlipAngleY = p->getFlipAngleY();
 	addPiece(p);
 	computeCenter();
 }
@@ -12,12 +14,12 @@ void Joined::computeCenter() {
 	float total_x=0.0f, total_z=0.0f; // already share a y
 	unsigned int num_pieces = mPieces.size();
 	for(unsigned int i = 0; i < num_pieces; i++) {
-		Coord *pos = mPieces[i]->getPos();
+		Coord *pos = mPieces[i]->getPos(false);
 		total_x += pos->mx;
 		total_z += pos->mz;
 	}
 	mCenter->mx = total_x / num_pieces;
-	mCenter->my = mPieces[0]->getPos()->my;
+	mCenter->my = mPieces[0]->getPos(false)->my;
 	mCenter->mz = total_z / num_pieces;
 }
 

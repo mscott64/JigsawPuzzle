@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Coord.h" />
+    <ClInclude Include="..\src\glm\glm.hpp" />
     <ClInclude Include="..\src\Group.h" />
     <ClInclude Include="..\src\Joined.h" />
     <ClInclude Include="..\src\Piece.h" />

@@ -47,7 +47,7 @@ void drawHighlightRect(float r, float g, float b, Piece *piece) {
 	const float extra = 0.05f;
 	glStencilFunc(GL_ALWAYS, 0, -1);
 	float w, h;
-	Coord *pos = piece->getPos();
+	Coord *pos = piece->getPos(false);
 	w = piece->getWidth() + extra;
 	h = piece->getHeight() + extra;
 	glPushMatrix();

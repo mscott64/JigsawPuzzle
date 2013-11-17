@@ -4,7 +4,10 @@
 #else
 #include <GL/glut.h>
 #endif
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include "Joined.h"
+#include <iostream> // TODO: get rid of this
 
 const float def_size = 1.0f;
 const float half_depth = 0.015625f;
@@ -25,6 +28,24 @@ Piece::~Piece() {
 	delete mPos;
 	delete mLow;
 	delete mHigh;
+}
+
+float Piece::getRotateAngle() {
+	if(mJoined == NULL)
+		return mRotateAngle;
+	return mJoined->getRotateAngle();
+}
+
+float Piece::getFlipAngleX() {
+	if(mJoined == NULL)
+		return mFlipAngleX;
+	return mJoined->getFlipAngleX();
+}
+
+float Piece::getFlipAngleY() {
+	if(mJoined == NULL)
+		return mFlipAngleY;
+	return mJoined->getFlipAngleY();
 }
 
 void Piece::draw() {
@@ -150,4 +171,27 @@ void Piece::rotate(float angle) {
 	else { // rotate about the center
 		mJoined->rotate(angle);
 	}
+}
+
+Coord *Piece::getPos(bool compute) { 
+	if(mJoined == NULL || !compute)
+		return mPos; 
+	Coord *center = mJoined->getCenter();
+	glm::vec4 pos = glm::vec4(0.0, 0.0, 0.0, 1.0);
+	glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(center->mx, center->my, center->mz));
+	model = glm::rotate(model, mJoined->getRotateAngle(), glm::vec3(0.0, 1.0, 0.0));
+	model = glm::rotate(model, mJoined->getFlipAngleX(), glm::vec3(0.0, 0.0, 1.0));
+	model = glm::rotate(model, mJoined->getFlipAngleY(), glm::vec3(1.0, 0.0, 0.0));
+	model = glm::translate(model, glm::vec3(mPos->mx - center->mx, 0.0, mPos->mz - center->mz));
+	glm::vec4 out = model * pos;
+
+	/*std::cout << "Pos " << pos[0] << "," << pos[1] << "," << pos[2] << "," << pos[3] << std::endl;
+	std::cout << "Out " << out[0] << "," << out[1] << "," << out[2] << "," << out[3] << std::endl;
+
+	std::cout << "Model" << std::endl;
+	std::cout << model[0][0] << "," << model[1][0] << "," << model[2][0] << "," << model[3][0] << std::endl;
+	std::cout << model[0][1] << "," << model[1][1] << "," << model[2][1] << "," << model[3][1] << std::endl;
+	std::cout << model[0][2] << "," << model[1][2] << "," << model[2][2] << "," << model[3][2] << std::endl;
+	std::cout << model[0][3] << "," << model[1][3] << "," << model[2][3] << "," << model[3][3] << std::endl;*/
+	return new Coord(out[0], out[1], out[2]);
 }

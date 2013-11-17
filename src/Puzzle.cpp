@@ -11,9 +11,13 @@
 #include <iostream> // TODO: get rid of this
 #include "Joined.h"
 
+#define CONV (3.14159265f / 180.0f)
+
 typedef unsigned char Uint8;
 const char *img_nm = "castle.bmp";//"ga_tech.bmp";//"atl_falcons.bmp";
-const float eps = 0.04f;
+const float eps = 0.01f;
+const float angle_eps = 5.0f;
+float dist_eps;
 
 int Puzzle::LoadBMP(const char* location, unsigned int &texture) {
 	Uint8* datBuff[2] = {nullptr, nullptr}; // Header buffers
@@ -97,6 +101,8 @@ Puzzle::Puzzle(int num_pieces) {
 	mPieces.resize(piece_count);
 	int index = 0;
 	mPieceSize = 5.0f / num_pieces;
+	
+	dist_eps = pow(mPieceSize + eps, 2);
 	float start = -num_pieces * (mPieceSize + space) / 2.0f;
 	float tex_sz = 1.0f / num_pieces;
 	for(int i = 0; i < num_pieces; i++) {
@@ -185,20 +191,63 @@ bool Puzzle::check(Piece *p) {
 	return ret;
 }
 
+float dist(float dx, float dy) {
+	return pow(dx, 2) + pow(dy, 2);
+}
+
+bool isInLine(Coord *pPos, Coord *nPos, int dir, float angle) {
+	float dx, dy, vx, vy, ax, ay, dot, off_by;
+	dx = pPos->mx - nPos->mx;
+	dy = pPos->mz - nPos->mz;
+	if(dist(dx, dy) > dist_eps)
+		return false;
+
+	switch(dir) {
+	case BELOW:
+		vx = sin(-angle * CONV);
+		vy = -cos(-angle * CONV);
+		break;
+	case ABOVE:
+		vx = -sin(-angle * CONV);
+		vy = cos(-angle * CONV);
+		break;
+	case LEFT:
+		vx = cos(-angle * CONV);
+		vy = sin(-angle * CONV);
+		break;
+	case RIGHT:
+		vx = -cos(-angle * CONV);
+		vy = -sin(-angle * CONV);
+		break;
+	}
+
+	dot = vx * dx + vy * dy;
+	if(dot < 0)
+		return false;
+
+	ax = dot * vx + nPos->mx;
+	ay = dot * vy + nPos->mz;
+	off_by = dist(pPos->mx - ax, pPos->mz - ay);
+	return off_by < eps;
+}
+
 bool Puzzle::connect(Piece *p) {
 	int dir;
-	float dx, dy;
+	float d_angle, d_flipX, d_flipY;
 	Piece *neighbor;
-	int id = p->getID();
+	Coord *pos = p->getPos(true);
 	bool ret = false;
 	for(unsigned int i = 0; i < p->getNumNeighbors(); i++) {
 		neighbor = p->getNeighbor(i);
 		dir = p->getDirection(i);
-		dx = neighbor->getPos()->mx - p->getPos()->mx;
-		dy = neighbor->getPos()->mz - p->getPos()->mz;
+		d_angle = abs(neighbor->getRotateAngle() - p->getRotateAngle());
+		d_flipX = abs(neighbor->getFlipAngleX() - p->getFlipAngleX());
+		d_flipY = abs(neighbor->getFlipAngleY() - p->getFlipAngleY());
+		if(d_angle > 10.0f || d_flipX > 10.0f || d_flipY > 10.0f)
+			continue;
 		switch(dir) {
 		case BELOW: 
-			if(abs(dx) < eps && abs(dy) < eps + mPieceSize && dy >= 0) {
+			if(isInLine(pos, neighbor->getPos(true), BELOW, neighbor->getRotateAngle())) {
 				if(!ret)
 					join(p, neighbor, BELOW);
 				p->removeNeighbor(i);
@@ -207,7 +256,7 @@ bool Puzzle::connect(Piece *p) {
 			}
 			break;
 		case ABOVE: 
-			if(abs(dx) < eps && abs(dy) < eps + mPieceSize && dy <= 0) {
+			if(isInLine(pos, neighbor->getPos(true), ABOVE, neighbor->getRotateAngle())) {
 				if(!ret)
 					join(p, neighbor, ABOVE);
 				p->removeNeighbor(i);
@@ -216,7 +265,7 @@ bool Puzzle::connect(Piece *p) {
 			}
 			break;
 		case RIGHT:
-			if(abs(dx) < eps + mPieceSize && abs(dy) < eps && dx >= 0) {
+			if(isInLine(pos, neighbor->getPos(true), RIGHT, neighbor->getRotateAngle())) {
 				if(!ret)
 					join(p, neighbor, RIGHT);
 				p->removeNeighbor(i);
@@ -225,7 +274,7 @@ bool Puzzle::connect(Piece *p) {
 			}
 			break;
 		case LEFT:
-			if(abs(dx) < eps + mPieceSize && abs(dy) < eps && dx <= 0) {
+			if(isInLine(pos, neighbor->getPos(true), LEFT, neighbor->getRotateAngle())) {
 				if(!ret)
 					join(p, neighbor, LEFT);
 				p->removeNeighbor(i);
@@ -243,24 +292,24 @@ void Puzzle::join(Piece *moving, Piece *fixed, int dir) {
 	float dx, dy, dz;
 	switch(dir) {
 	case ABOVE:
-		dx = fixed->getPos()->mx - moving->getPos()->mx;
-		dy = fixed->getPos()->my - moving->getPos()->my;
-		dz = fixed->getPos()->mz + mPieceSize - moving->getPos()->mz;
+		dx = fixed->getPos(false)->mx - moving->getPos(false)->mx;
+		dy = fixed->getPos(false)->my - moving->getPos(false)->my;
+		dz = fixed->getPos(false)->mz + mPieceSize - moving->getPos(false)->mz;
 		break;
 	case BELOW:
-		dx = fixed->getPos()->mx - moving->getPos()->mx;
-		dy = fixed->getPos()->my - moving->getPos()->my;
-		dz = fixed->getPos()->mz - mPieceSize - moving->getPos()->mz;
+		dx = fixed->getPos(false)->mx - moving->getPos(false)->mx;
+		dy = fixed->getPos(false)->my - moving->getPos(false)->my;
+		dz = fixed->getPos(false)->mz - mPieceSize - moving->getPos(false)->mz;
 		break;
 	case LEFT:
-		dx = fixed->getPos()->mx + mPieceSize - moving->getPos()->mx;
-		dy = fixed->getPos()->my - moving->getPos()->my;
-		dz = fixed->getPos()->mz - moving->getPos()->mz;
+		dx = fixed->getPos(false)->mx + mPieceSize - moving->getPos(false)->mx;
+		dy = fixed->getPos(false)->my - moving->getPos(false)->my;
+		dz = fixed->getPos(false)->mz - moving->getPos(false)->mz;
 		break;
 	case RIGHT:
-		dx = fixed->getPos()->mx - mPieceSize - moving->getPos()->mx;
-		dy = fixed->getPos()->my - moving->getPos()->my;
-		dz = fixed->getPos()->mz - moving->getPos()->mz;
+		dx = fixed->getPos(false)->mx - mPieceSize - moving->getPos(false)->mx;
+		dy = fixed->getPos(false)->my - moving->getPos(false)->my;
+		dz = fixed->getPos(false)->mz - moving->getPos(false)->mz;
 		break;
 	}
 	moving->move(dx, dy, dz);
