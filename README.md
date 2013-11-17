@@ -14,4 +14,4 @@ All source files are in the src folder
 
 11/15/2013 - Puzzle functionality: Press Ctrl and click on a piece to pick it up. (You don't have to hold Ctrl down while moving the piece). When the selected piece is in the right spot, it connects to its neighbor and they move as one.
 
-11/16/2013 - Keyboard piece manipulation - Select a piece by clicking it. (No need to hold Ctrl anymore). To deselect a piece, click outside the pieces. Flip a piece by selecting it. Then pressing f/F. Rotate a piece by selecting it, then press r/R to rotate to the right and e/E to rotate to the left. (This works for single and joined pieces.)
+11/16/2013 - Keyboard piece manipulation - Select a piece by clicking it. (No need to hold Ctrl anymore). To deselect a piece, click outside the pieces. Flip a piece by selecting it. Then pressing f/F to flip in the x direction and d/D to flip in the y direction. Rotate a piece by selecting it, then press r/R to rotate to the right and e/E to rotate to the left. (This works for single and joined pieces.)
