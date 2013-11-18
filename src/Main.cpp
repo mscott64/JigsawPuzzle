@@ -15,6 +15,7 @@ const float fraction = 0.1f;
 float zoom = 0.0f;
 Puzzle *puzzle;
 Piece *piece;
+Group *group;
 int prev_x, prev_y;
 unsigned int group_button_texture;
 
@@ -71,15 +72,27 @@ void drawHighlightRect(float r, float g, float b, Piece *piece) {
 }
 
 void drawHighlight() {
-	if(piece == NULL)
-		return;
+	if(piece != NULL) {
+		if(piece->mJoined != NULL) {
+			Joined *join = piece->mJoined;
+			for(unsigned int i = 0; i < join->getNumPieces(); i++)
+				drawHighlightRect(0.75f, 0.75f, 0.0f, join->getPiece(i));
+		} else {
+			drawHighlightRect(0.75f, 0.75f, 0.0f, piece);
+		}
+	}
 
-	if(piece->mJoined != NULL) {
-		Joined *join = piece->mJoined;
-		for(unsigned int i = 0; i < join->getNumPieces(); i++)
-			drawHighlightRect(0.75f, 0.75f, 0.0f, join->getPiece(i));
-	} else {
-		drawHighlightRect(0.75f, 0.75f, 0.0f, piece);
+	if(group != NULL) {
+		for(unsigned int i = 0; i < group->getNumPieces(); i++) {
+			Piece *p = group->getPiece(i);
+			if(p->mJoined == NULL)
+				drawHighlightRect(0.0f, 0.0f, 0.8f, group->getPiece(i));
+			else {
+				Joined *join = p->mJoined;
+				for(unsigned int j = 0; j < join->getNumPieces(); j++)
+					drawHighlightRect(0.0f, 0.0f, 0.8f, join->getPiece(j));
+			}
+		}
 	}
 }
 
@@ -155,6 +168,11 @@ void keyPressed(unsigned char key, int x, int y) {
 	case 'E':
 		if(piece != NULL)
 			piece->rotate(1.0f);
+		break;
+	case 'g':
+	case 'G':
+		group = NULL; // end the existing group
+		break;
 	}
 }
 
@@ -183,6 +201,22 @@ void mousePressed(int button, int state, int x, int y) {
 		GLuint piece_id;
 		glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &piece_id);
 		piece = puzzle->getPiece(piece_id);
+		if(piece !=NULL && button == GLUT_RIGHT_BUTTON) {
+			if(piece->mGroup == NULL) {
+				if(group == NULL) {
+					group = new Group(piece);
+					puzzle->addGroup(group);
+				} else {
+					group->addPiece(piece);
+				}
+			} else {
+				group = piece->mGroup;
+				group->fan();
+			}
+			piece = NULL;
+		} else {
+			group = NULL;
+		}
 	}
 	prev_x = x; prev_y = y;
 }

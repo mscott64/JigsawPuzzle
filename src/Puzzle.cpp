@@ -334,3 +334,17 @@ void Puzzle::join(Piece *moving, Piece *fixed, int dir) {
 	}
 	fixed->mJoined->computeCenter();
 }
+
+void Puzzle::addGroup(Group *g) {
+	mGroups.push_back(g);
+}
+
+void Puzzle::deleteGroup(Group *g) {
+	for(unsigned int i = 0; i < mGroups.size(); i++) {
+		if(g == mGroups[i]) {
+			mGroups.erase(mGroups.begin()+i);
+			return;
+		}
+	}
+	delete g;
+}

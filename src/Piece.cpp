@@ -19,9 +19,14 @@ Piece::Piece(int id) {
 	mHigh = new Coord();
 	mw = mh = def_size;
 	mJoined = NULL;
+	mGroup = NULL;
 	mFlipAngleX = 0.0f;
 	mFlipAngleY = 0.0f;
 	mRotateAngle = 0.0f;
+	//Animation
+	inMotion = false;
+	mFrame = 0;
+	d_x = d_y = d_z = 0;
 }
 
 Piece::~Piece() {
@@ -49,6 +54,22 @@ float Piece::getFlipAngleY() {
 }
 
 void Piece::draw() {
+	const int frames = 100;
+	const float small = 0.1f / frames; 
+	const float big = 0.8f / frames;
+	if(inMotion) {
+		if(mFrame < frames) { // 0.1 -> 100
+			move(small*d_x, small*d_y, small*d_z);
+		} else if(mFrame < 2 * frames) { // 0.8 -> 100
+			move(big*d_x, big*d_y, big*d_z);
+		} else if(mFrame < 3 * frames) { // 0.1 -> 100
+			move(small*d_x, small*d_y, small*d_z);
+		}
+		if(mFrame == 3 * frames)
+			inMotion = false;
+		mFrame++;
+	}
+
 	glStencilFunc(GL_ALWAYS, mId, -1);
 	glPushMatrix();
 	if(mJoined == NULL) {
@@ -127,6 +148,12 @@ void Piece::move(float dx, float dy, float dz) {
 	mJoined->computeCenter();
 }
 
+void Piece::moveAnimated(float dx, float dy, float dz) {
+	inMotion = true;
+	d_x = dx; d_y = dy; d_z = dz;
+	mFrame = 0;
+}
+
 void Piece::setTextureBounds(float lx, float ly, float hx, float hy) {
 	mLow->mx = lx;
 	mLow->my = ly;
@@ -184,14 +211,5 @@ Coord *Piece::getPos(bool compute) {
 	model = glm::rotate(model, mJoined->getFlipAngleY(), glm::vec3(1.0, 0.0, 0.0));
 	model = glm::translate(model, glm::vec3(mPos->mx - center->mx, 0.0, mPos->mz - center->mz));
 	glm::vec4 out = model * pos;
-
-	/*std::cout << "Pos " << pos[0] << "," << pos[1] << "," << pos[2] << "," << pos[3] << std::endl;
-	std::cout << "Out " << out[0] << "," << out[1] << "," << out[2] << "," << out[3] << std::endl;
-
-	std::cout << "Model" << std::endl;
-	std::cout << model[0][0] << "," << model[1][0] << "," << model[2][0] << "," << model[3][0] << std::endl;
-	std::cout << model[0][1] << "," << model[1][1] << "," << model[2][1] << "," << model[3][1] << std::endl;
-	std::cout << model[0][2] << "," << model[1][2] << "," << model[2][2] << "," << model[3][2] << std::endl;
-	std::cout << model[0][3] << "," << model[1][3] << "," << model[2][3] << "," << model[3][3] << std::endl;*/
 	return new Coord(out[0], out[1], out[2]);
 }

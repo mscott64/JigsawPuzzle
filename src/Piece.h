@@ -18,10 +18,11 @@ public:
 	void setTextureBounds(float lx, float ly, float hx, float hy);
 	Coord *getPos(bool compute);
 	void setSize(float w, float h) { mw = w/2.0f; mh = h/2.0f; }
-	float getWidth() { return mw; }
+	float getWidth() { return mw ; }
 	float getHeight() { return mh; }
 	int getID() { return mId; }
 	void move(float dx, float dy, float dz);
+	void moveAnimated(float dx, float dy, float dz);
 	void addNeighbor(Piece *p) { mNeighbors.push_back(p); }
 	void removeNeighbor(int i) { mNeighbors.erase(mNeighbors.begin()+i); mDirections.erase(mDirections.begin()+i);}
 	void removeNeighbor(Piece *p);
@@ -48,6 +49,11 @@ private:
 	float mFlipAngleX;
 	float mFlipAngleY;
 	float mRotateAngle;
+	// Animation
+	bool inMotion;
+	int mFrame;
+	float d_x, d_y, d_z;
+	float dest_x, dest_y, dest_z;
 };
 
 #endif /* Piece.h */

@@ -3,24 +3,26 @@
 
 #include <vector>
 class Piece;
+class Coord;
 
 class Group {
-	public:
+public:
 	Group() {};
-	Group(Piece *p) { addPiece(p); }
-	void addPiece(Piece *p) { // don't add duplicates
-		for(unsigned int i = 0; i < mPieces.size(); i++) {
-			if(mPieces[i] == p)
-				return;
-		}
-		mPieces.push_back(p); 
-	}
+	Group(Piece *p);
+	void addPiece(Piece *p);
+	void removePiece(Piece *p);
 	unsigned int getNumPieces() { return mPieces.size(); }
 	Piece *getPiece(int i) { return mPieces[i]; }
 	std::vector<Piece *>getPieces() { return mPieces; }
+	Coord *getAxis() { return axis; }
+	Coord *setAxis(Coord *c) { axis = c; }
+	void fan();
+	void stack();
 
 protected:
 	std::vector<Piece *> mPieces;
+	Coord *axis;
+	bool isStacked;
 };
 
 #endif /* Group.h */
