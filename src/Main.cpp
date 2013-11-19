@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(50,50);
 	glutInitWindowSize(1100, 600);
 	glutCreateWindow("Jigsaw Puzzle");
-	puzzle = new Puzzle(EASY, 0);
+	puzzle = new Puzzle(HARD, 2);
 	piece = NULL;
 
 	// register callbacks
