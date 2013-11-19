@@ -10,7 +10,7 @@ public:
 	Group() {};
 	Group(Piece *p);
 	void addPiece(Piece *p);
-	void removePiece(Piece *p);
+	bool removePiece(Piece *p);
 	unsigned int getNumPieces() { return mPieces.size(); }
 	Piece *getPiece(int i) { return mPieces[i]; }
 	std::vector<Piece *>getPieces() { return mPieces; }
@@ -18,6 +18,8 @@ public:
 	Coord *setAxis(Coord *c) { axis = c; }
 	void fan();
 	void stack();
+	void move(float dx, float dy, float dz);
+	bool isInStack(Piece *p);
 
 protected:
 	std::vector<Piece *> mPieces;

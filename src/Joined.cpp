@@ -44,3 +44,12 @@ void Joined::flipY() {
 	else
 		mFlipAngleY += 180.0f;
 }
+
+void Joined::rotate(float angle) {
+	mRotateAngle += angle;
+	// Keep angles in range [0, 360)
+	if(mRotateAngle >= 360.0f)
+		mRotateAngle -= 360.0f;
+	if(mRotateAngle < 0)
+		mRotateAngle += 360.0f;
+}

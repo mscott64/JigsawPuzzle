@@ -134,6 +134,7 @@ void Piece::move(float dx, float dy, float dz) {
 	mPos->mx += dx;
 	mPos->my += dy;
 	mPos->mz += dz;
+
 	if(mJoined == NULL)
 		return;
 	// move all attached pieces
@@ -193,8 +194,14 @@ void Piece::flipY() {
 }
 
 void Piece::rotate(float angle) { 
-	if(mJoined == NULL)
+	if(mJoined == NULL) {
 		mRotateAngle += angle; 
+		// Keep angles in range [0, 360)
+		if(mRotateAngle >= 360.0f)
+			mRotateAngle -= 360.0f;
+		if(mRotateAngle < 0)
+			mRotateAngle += 360.0f;
+	}
 	else { // rotate about the center
 		mJoined->rotate(angle);
 	}

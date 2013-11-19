@@ -41,14 +41,31 @@ void Group::addPiece(Piece *p) { // don't add duplicates
 	p->moveAnimated(d->mx, d->my, d->mz);
 }
 
-void Group::removePiece(Piece *p) {
+bool Group::removePiece(Piece *p) {
 	unsigned int index;
-	for(unsigned int i = 0; i < mPieces.size(); i++) {
-		if(mPieces[i] == p) {
-			mPieces[i]->mGroup = NULL;
-			index = i;
-			mPieces.erase(mPieces.begin()+i);
-			break;
+	if(p->mJoined == NULL) {
+		for(unsigned int i = 0; i < mPieces.size(); i++) {
+			if(mPieces[i] == p) {
+				mPieces[i]->mGroup = NULL;
+				index = i;
+				mPieces.erase(mPieces.begin()+i);
+				break;
+			}
+		}
+	} else {
+		Joined *join = p->mJoined;
+		Piece *curr;
+		for(unsigned int j = 0; j < join->getNumPieces(); j++) {
+			curr = join->getPiece(j);
+			curr->mGroup = NULL;
+			for(unsigned int i = 0; i < mPieces.size(); i++) {
+				if(mPieces[i] == curr) {
+					mPieces[i]->mGroup = NULL;
+					index = i;
+					mPieces.erase(mPieces.begin()+i);
+					break;
+				}
+			}
 		}
 	}
 
@@ -56,6 +73,8 @@ void Group::removePiece(Piece *p) {
 	for(unsigned int i = index; i < mPieces.size(); i++) {
 		mPieces[i]->move(0.0f, -0.05f, 0.0f);
 	}
+
+	return mPieces.size() == 0;
 }
 
 void Group::fan() {
@@ -63,9 +82,10 @@ void Group::fan() {
 		stack();
 		return;
 	}
-	float deg = 360.0f / mPieces.size();
+	unsigned int num_pieces = mPieces.size();
+	float deg = 360.0f / num_pieces;
 	float x,y,tx,ty;
-	x = 0.0f; y = -1.0f;
+	x = 0.0f; y = (num_pieces * num_pieces)/-100.0f - 1.0f;
 	for(unsigned int i = 0; i < mPieces.size(); i++) {
 		mPieces[i]->moveAnimated(x, 0.0f, y);
 		tx = x; ty = y;
@@ -89,4 +109,23 @@ void Group::stack() {
 		p->moveAnimated(d->mx, d->my, d->mz);
 	}
 	isStacked = true;
+}
+
+void Group::move(float dx, float dy, float dz) {
+	
+	axis->mx += dx;
+	axis->my += dy;
+	axis->mz += dz;
+
+	for(unsigned int i = 0; i < mPieces.size(); i++)
+		mPieces[i]->move(dx, dy, dz);
+}
+
+bool Group::isInStack(Piece *p) {
+	Coord *pos = p->getPos(true);
+	if(Coord::areTogether(pos, axis))  {
+		addPiece(p);
+		return true;
+	}
+	return false;
 }

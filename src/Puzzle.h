@@ -11,7 +11,7 @@ enum {EASY = 7, MEDIUM = 10, HARD = 14};
 
 class Puzzle {
 public:
-	Puzzle(int type);
+	Puzzle(int type, int puz);
 	~Puzzle();
 	void draw();
 	Piece *getPiece(unsigned int id);
@@ -19,6 +19,8 @@ public:
 	static int LoadBMP(const char* location, unsigned int &texture);
 	void addGroup(Group *g);
 	void deleteGroup(Group *g);
+	Group *checkGroups(Piece *p);
+	void solve(float cx, float cy, float cz);
 private:
 	void join(Piece *moving, Piece *fixed, int dir);
 	bool connect(Piece *p);
@@ -26,6 +28,7 @@ private:
 	std::vector<Group *> mGroups;
 	unsigned int mTexture;
 	float mPieceSize;
+	int mType;
 };
 
 #endif /* Puzzle.h */

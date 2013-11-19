@@ -14,7 +14,7 @@ public:
 	float getRotateAngle() { return mRotateAngle; }
 	float getFlipAngleX() { return mFlipAngleX; }
 	float getFlipAngleY() { return mFlipAngleY; }
-	void rotate(float angle) { mRotateAngle += angle; }
+	void rotate(float angle);
 	void computeCenter();
 	void flipX();
 	void flipY();

@@ -9,7 +9,7 @@
 #include <GL/glut.h>
 #endif
 
-float cx=0.0f, cy=10.0f, cz=0.5f;
+float cx=0.0f, cy=10.0f, cz=1.0f;
 float dx=0.0f, dy=-10.0f, dz=-1.0f;
 const float fraction = 0.1f;
 float zoom = 0.0f;
@@ -18,6 +18,7 @@ Piece *piece;
 Group *group;
 int prev_x, prev_y;
 unsigned int group_button_texture;
+bool move = false;
 
 void reshape(int w, int h) {
 
@@ -59,6 +60,8 @@ void drawHighlightRect(float r, float g, float b, Piece *piece) {
 		Coord *center = piece->mJoined->getCenter();
 		glTranslatef(center->mx, center->my, center->mz);
 		glRotatef(piece->mJoined->getRotateAngle(), 0.0f, 1.0f, 0.0f);
+		glRotatef(piece->mJoined->getFlipAngleX(), 0.0f, 0.0f, 1.0f);
+		glRotatef(piece->mJoined->getFlipAngleY(), 1.0f, 0.0f, 0.0f);
 		glTranslatef(pos->mx - center->mx, 0.0f, pos->mz - center->mz);
 	}
 	glColor3f(r, g, b);
@@ -119,7 +122,7 @@ void draw() {
 
     // Draw playing surface
 	glStencilFunc(GL_ALWAYS, 0, -1);
-	glColor3f(0.9f, 0.9f, 0.9f);
+	glColor3f(0.25f, 0.25f, 0.25f);
 	glBegin(GL_QUADS);
 		glVertex3f(-100.0f, 0.0f, -100.0f);
 		glVertex3f(-100.0f, 0.0f,  100.0f);
@@ -161,17 +164,25 @@ void keyPressed(unsigned char key, int x, int y) {
 		break;
 	case 'r':
 	case 'R':
-		if(piece != NULL)
+		if(piece != NULL) {
 			piece->rotate(-1.0f);
+			puzzle->check(piece);
+		}
 		break;
 	case 'e':
 	case 'E':
-		if(piece != NULL)
+		if(piece != NULL) {
 			piece->rotate(1.0f);
+			puzzle->check(piece);
+		}
 		break;
 	case 'g':
 	case 'G':
 		group = NULL; // end the existing group
+		break;
+	case 's':
+	case 'S':
+		puzzle->solve(cx+dx, cy+dy, cz+dz);
 		break;
 	}
 }
@@ -195,11 +206,16 @@ void specKeyPressed(int key, int xx, int yy) {
 }
 
 void mousePressed(int button, int state, int x, int y) {
+	prev_x = x; prev_y = y;
 
 	if(state == GLUT_DOWN) {
 		int height = glutGet(GLUT_WINDOW_HEIGHT);
 		GLuint piece_id;
 		glReadPixels(x, height-y-1, 1, 1, GL_STENCIL_INDEX, GL_UNSIGNED_INT, &piece_id);
+		if(piece != NULL && piece->getID() == (int)piece_id) {
+			piece = NULL;
+			return;
+		}
 		piece = puzzle->getPiece(piece_id);
 		if(piece !=NULL && button == GLUT_RIGHT_BUTTON) {
 			if(piece->mGroup == NULL) {
@@ -211,30 +227,81 @@ void mousePressed(int button, int state, int x, int y) {
 				}
 			} else {
 				group = piece->mGroup;
-				group->fan();
+				if(glutGetModifiers() == GLUT_ACTIVE_CTRL) {
+					// prep to move so do nothing
+				} else 
+					group->fan();
 			}
 			piece = NULL;
 		} else {
+			move = button == GLUT_RIGHT_BUTTON;
 			group = NULL;
+		}
+	}
+}
+
+void mouseMoved(int x, int y) {
+	float fac = 0.001f * cy;
+	float delta_x = fac * (x - prev_x); 
+	float delta_z = fac * (y - prev_y);
+	if(piece != NULL) {
+		if(piece->mGroup != NULL) {
+			Group *g = piece->mGroup;
+			bool empty = g->removePiece(piece);
+			if(empty)
+				puzzle->deleteGroup(g);
+		}
+		piece->move(delta_x, 0.0f, delta_z);
+		puzzle->check(piece);
+		if(piece->mGroup == NULL) {
+			group = puzzle->checkGroups(piece);
+			if(group != NULL)
+				piece = NULL;
+		}
+	} else if(group != NULL) {
+		group->move(delta_x, 0.0f, delta_z);	
+	} else {
+		if(move) {
+			cx+=-fraction * (x - prev_x);
+			cz+=-fraction * (y - prev_y);
+			
+		} else {
+			if(y - prev_y < 0)
+				zoom = 0.01f * (y - prev_y);
+			else
+				zoom = 0.01f * (y - prev_y);
 		}
 	}
 	prev_x = x; prev_y = y;
 }
 
-void mouseMoved(int x, int y) {
-
-	if(piece != NULL) {
-		float fac = 0.001f * cy;
-		float delta_x = -fac * (prev_x - x); 
-		float delta_z = -fac * (prev_y - y);
-		piece->move(delta_x, 0.0f, delta_z);
-		if(puzzle->check(piece))
-			piece = NULL;
-	}
-	prev_x = x; prev_y = y;
+float norm(float dx, float dy) {
+	return sqrt(dx * dx + dy * dy);
 }
 
 void passiveMouseMoved(int x, int y) {
+
+	if(piece == NULL)
+		return;
+	
+	float delta_x, delta_y;
+	delta_x = (float)(x - prev_x);
+	delta_y = (float)(y - prev_y);
+	float len = norm(delta_x, delta_y);
+	delta_x = delta_x / len; // normalized
+	delta_y = delta_y / len; 
+
+	float left = -1.0f * delta_x + 0.0f * delta_y;
+	if(abs(left - 1.0f) < 1e-6f) {
+		piece->rotate(10.0f);
+		puzzle->check(piece);
+	}
+	float right = 1.0f * delta_x + 0.0f * delta_y;
+	if(abs(right - 1.0f) < 1e-6f) {
+		piece->rotate(-10.0f);
+		puzzle->check(piece);
+	}
+
 	prev_x = x; prev_y = y;
 }
 
@@ -246,7 +313,7 @@ int main(int argc, char **argv) {
 	glutInitWindowPosition(50,50);
 	glutInitWindowSize(1100, 600);
 	glutCreateWindow("Jigsaw Puzzle");
-	puzzle = new Puzzle(EASY);
+	puzzle = new Puzzle(EASY, 0);
 	piece = NULL;
 
 	// register callbacks

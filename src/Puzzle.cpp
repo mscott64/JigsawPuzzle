@@ -14,9 +14,9 @@
 #define CONV (3.14159265f / 180.0f)
 
 typedef unsigned char Uint8;
-const char *img_nm = "castle.bmp";//"ga_tech.bmp";//"atl_falcons.bmp";
+const char *img_nm[] = { "ga_tech.bmp", "atl_falcons.bmp", "castle.bmp" };
 const float eps = 0.01f;
-const float angle_eps = 5.0f;
+const float angle_eps = 30.0f;
 float dist_eps;
 
 int Puzzle::LoadBMP(const char* location, unsigned int &texture) {
@@ -95,23 +95,30 @@ int Puzzle::LoadBMP(const char* location, unsigned int &texture) {
 	return 0; // Return success code 
 }
 
-Puzzle::Puzzle(int num_pieces) {
+Puzzle::Puzzle(int num_pieces, int puz) {
+	mType = num_pieces;
 	const float space = 0.1f;
 	int piece_count = num_pieces * num_pieces;
 	mPieces.resize(piece_count);
 	int index = 0;
 	mPieceSize = 5.0f / num_pieces;
-	
-	dist_eps = pow(mPieceSize + eps, 2);
-	float start = -num_pieces * (mPieceSize + space) / 2.0f;
+	int x, y;
+	int angle;
+	Piece *p;
+	dist_eps = pow(mPieceSize + 0.3f, 2);
 	float tex_sz = 1.0f / num_pieces;
 	for(int i = 0; i < num_pieces; i++) {
 		for(int j = 0; j < num_pieces; j++) {
 			index = i * num_pieces + j;
-			mPieces[index] = new Piece(index+1); // to match stencil buffer
-			mPieces[index]->setPos(start + i*(mPieceSize + space), 1.0f, start + j*(mPieceSize + space));
-			mPieces[index]->setSize(mPieceSize, mPieceSize);
-			mPieces[index]->setTextureBounds(i*tex_sz, 1.0f-(j+1)*tex_sz, (i+1)*tex_sz, 1.0f-j*tex_sz);
+			x = rand() % 400 - 200;
+			y = rand() % 400 - 200;
+			angle = rand() % 360;
+			p = new Piece(index+1); // to match stencil buffer
+			p->setPos(x*0.025f, 1.0f, y*0.025f);
+			p->setSize(mPieceSize, mPieceSize);
+			p->setTextureBounds(i*tex_sz, 1.0f-(j+1)*tex_sz, (i+1)*tex_sz, 1.0f-j*tex_sz);
+			p->rotate((float)angle);
+			mPieces[index] = p;
 		}
 	}
 
@@ -144,7 +151,7 @@ Puzzle::Puzzle(int num_pieces) {
 	}
 
 	char full_img_nm[50];
-	sprintf_s(full_img_nm, "%s%s", IMG_PATH, img_nm);
+	sprintf_s(full_img_nm, "%s%s", IMG_PATH, img_nm[puz % 3]);
 	int e = LoadBMP(full_img_nm, mTexture);
 	if(e != 0) {
 		std::cout << "Error loading texture" << std::endl;
@@ -233,17 +240,15 @@ bool isInLine(Coord *pPos, Coord *nPos, int dir, float angle) {
 
 bool Puzzle::connect(Piece *p) {
 	int dir;
-	float d_angle, d_flipX, d_flipY;
 	Piece *neighbor;
 	Coord *pos = p->getPos(true);
 	bool ret = false;
+	float d_angle;
 	for(unsigned int i = 0; i < p->getNumNeighbors(); i++) {
 		neighbor = p->getNeighbor(i);
 		dir = p->getDirection(i);
-		d_angle = abs(neighbor->getRotateAngle() - p->getRotateAngle());
-		d_flipX = abs(neighbor->getFlipAngleX() - p->getFlipAngleX());
-		d_flipY = abs(neighbor->getFlipAngleY() - p->getFlipAngleY());
-		if(d_angle > 10.0f || d_flipX > 10.0f || d_flipY > 10.0f)
+		d_angle = abs(p->getRotateAngle() - neighbor->getRotateAngle());
+		if(d_angle > angle_eps)
 			continue;
 		switch(dir) {
 		case BELOW: 
@@ -347,4 +352,31 @@ void Puzzle::deleteGroup(Group *g) {
 		}
 	}
 	delete g;
+}
+
+void Puzzle::solve(float cx, float cy, float cz) {
+	float start_x, start_z, dest_x, dest_z;
+	int x, z;
+	start_x = cx - (mType / 2.0f) * mPieceSize;
+	start_z = cz - (mType / 2.0f) * mPieceSize;
+
+	for(unsigned int i = 0; i < mPieces.size(); i++) {
+		x = i / mType;
+		z = i % mType;	
+		dest_x = start_x + x*mPieceSize;
+		dest_z = start_z + z*mPieceSize;
+		Piece *p = mPieces[i];
+		p->zeroAngle();
+		p->mJoined = NULL;
+		Coord *pos = p->getPos(false);
+		p->moveAnimated(dest_x - pos->mx, 1.0f - pos->my, dest_z - pos->mz);
+	}
+}
+
+Group *Puzzle::checkGroups(Piece *p) {
+	for(unsigned int i = 0; i < mGroups.size(); i++) {
+		if(mGroups[i]->isInStack(p))
+			return mGroups[i];
+	}
+	return NULL;
 }

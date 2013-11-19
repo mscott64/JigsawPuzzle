@@ -36,6 +36,7 @@ public:
 	float getRotateAngle();
 	float getFlipAngleX();
 	float getFlipAngleY();
+	void zeroAngle() { mRotateAngle = 0.0f; mFlipAngleX = 0.0f; mFlipAngleY = 0.0f; }
 	Joined *mJoined;
 	Group *mGroup;
 
